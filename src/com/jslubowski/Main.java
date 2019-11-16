@@ -27,7 +27,6 @@ public class Main {
 //        { // First algorithm
 //            // 1. Load image
 //            sourceImage = Imgcodecs.imread(projectFilePath + filename + ".jpg");
-//            Imgcodecs.imwrite(projectFilePath + filename + ".jpg", sourceImage);
 ////            // 2. Noise reduction through gaussian blur
 ////            Imgproc.GaussianBlur(sourceImage, sourceImage,
 ////                    new Size(3, 3), 0, 0, Core.BORDER_DEFAULT);
@@ -66,52 +65,50 @@ public class Main {
 //            Imgcodecs.imwrite(projectFilePath + filename + "_firstAlgorithm.jpg", sourceImage);
 //        }
 
-        { // Second algorithm
-            // 1. Load image
-            sourceImage = Imgcodecs.imread(projectFilePath + filename + ".jpg");
-            Imgcodecs.imwrite(projectFilePath + filename + ".jpg", sourceImage);
-            // 2. Noise reduction through gaussian blur
-            Imgproc.GaussianBlur(sourceImage, sourceImage,
-                    new Size(3, 3), 0, 0, Core.BORDER_DEFAULT);
-            Imgcodecs.imwrite(projectFilePath + filename + "_blurred.jpg", sourceImage);
-            // 3. Grayscale conversion
-            Imgproc.cvtColor(sourceImage, sourceImage, Imgproc.COLOR_RGB2GRAY);
-            Imgcodecs.imwrite(projectFilePath + filename + "_grayscale.jpg", sourceImage);
-            // 4. Adaptive thresholding
-            Imgproc.adaptiveThreshold(sourceImage,sourceImage, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
-                    Imgproc.THRESH_BINARY_INV, 31, 10 );
-            Imgcodecs.imwrite(projectFilePath + filename + "_adaptiveThresh.jpg", sourceImage);
-            // 5. Skeletonization in order to get simple borders
-            sourceImage = Skeletonization.sequentialThinning(sourceImage);
-            Imgcodecs.imwrite(projectFilePath + filename + "_secondAlgorithm2.jpg", sourceImage);
-            // 6. Find and draw contours
-            List<MatOfPoint> contours = new ArrayList<>();
-            Mat hierarchy = new Mat();
-            Imgproc.findContours(sourceImage, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-            Mat drawing = Mat.zeros(sourceImage.size(), CvType.CV_8UC3);
-            Scalar color = new Scalar(0, 255, 0);
-            for (int i = 0; i < contours.size(); i++) {
-                if(Imgproc.contourArea(contours.get(i)) > 2) {
-                    Imgproc.drawContours(drawing, contours, i, color, 2, Imgproc.LINE_8, hierarchy, 0, new Point());
-                }
-            }
-            Imgcodecs.imwrite(projectFilePath + filename + "_contours2.jpg", drawing);
-            // TODO 7. Find and draw moments (or blobs)
-            Mat rectangles = Mat.zeros(sourceImage.size(), CvType.CV_8UC3);
-            for(MatOfPoint c: contours) {
-                Rect rect = Imgproc.boundingRect(c);
-                if(rect.area() > 120) {
-                    Imgproc.rectangle(rectangles, rect, color, 2);
-                }
-            }
-            Imgcodecs.imwrite(projectFilePath + filename + "_rectangles2.jpg", rectangles);
-
-        }
+//        { // Second algorithm
+//            // 1. Load image
+//            sourceImage = Imgcodecs.imread(projectFilePath + filename + ".jpg");
+//            // 2. Noise reduction through gaussian blur
+//            Imgproc.GaussianBlur(sourceImage, sourceImage,
+//                    new Size(3, 3), 0, 0, Core.BORDER_DEFAULT);
+//            Imgcodecs.imwrite(projectFilePath + filename + "_blurred.jpg", sourceImage);
+//            // 3. Grayscale conversion
+//            Imgproc.cvtColor(sourceImage, sourceImage, Imgproc.COLOR_RGB2GRAY);
+//            Imgcodecs.imwrite(projectFilePath + filename + "_grayscale.jpg", sourceImage);
+//            // 4. Adaptive thresholding
+//            Imgproc.adaptiveThreshold(sourceImage,sourceImage, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+//                    Imgproc.THRESH_BINARY_INV, 31, 10 );
+//            Imgcodecs.imwrite(projectFilePath + filename + "_adaptiveThresh.jpg", sourceImage);
+//            // 5. Skeletonization in order to get simple borders
+//            sourceImage = Skeletonization.sequentialThinning(sourceImage);
+//            Imgcodecs.imwrite(projectFilePath + filename + "_secondAlgorithm2.jpg", sourceImage);
+//            // 6. Find and draw contours
+//            List<MatOfPoint> contours = new ArrayList<>();
+//            Mat hierarchy = new Mat();
+//            Imgproc.findContours(sourceImage, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+//            Mat drawing = Mat.zeros(sourceImage.size(), CvType.CV_8UC3);
+//            Scalar color = new Scalar(0, 255, 0);
+//            for (int i = 0; i < contours.size(); i++) {
+//                if(Imgproc.contourArea(contours.get(i)) > 2) {
+//                    Imgproc.drawContours(drawing, contours, i, color, 2, Imgproc.LINE_8, hierarchy, 0, new Point());
+//                }
+//            }
+//            Imgcodecs.imwrite(projectFilePath + filename + "_contours2.jpg", drawing);
+//            // Find and draw moments (or blobs if you prefer)
+//            Mat rectangles = Mat.zeros(sourceImage.size(), CvType.CV_8UC3);
+//            for(MatOfPoint c: contours) {
+//                Rect rect = Imgproc.boundingRect(c);
+//                if(rect.area() > 120) {
+//                    Imgproc.rectangle(rectangles, rect, color, 2);
+//                }
+//            }
+//            Imgcodecs.imwrite(projectFilePath + filename + "_rectangles2.jpg", rectangles);
+//
+//        }
 
 //        { // Third algorithm
 //            // 1. Load an image
 //            sourceImage = Imgcodecs.imread(projectFilePath + filename + ".jpg");
-//            Imgcodecs.imwrite(projectFilePath + filename + ".jpg", sourceImage);
 //            // 2. Grayscale conversion
 //            Imgproc.cvtColor(sourceImage, sourceImage, Imgproc.COLOR_RGB2GRAY);
 //            Imgcodecs.imwrite(projectFilePath + filename + "_grayscale.jpg", sourceImage);
@@ -142,7 +139,47 @@ public class Main {
 //            Imgcodecs.imwrite(projectFilePath + filename + "_contours4.jpg", drawing);
 //        }
 
-            { // TODO Fourth algorithm - use canny algorithm
+            { // TODO Fourth algorithm - implement canny algorithm
+                // 1. Load an image
+                sourceImage = Imgcodecs.imread(projectFilePath + filename + ".jpg");
+                // 2. Blur
+                Imgproc.blur(sourceImage, sourceImage, new Size(3, 3));
+                Imgcodecs.imwrite(projectFilePath + filename + "_blurred.jpg", sourceImage);
+                // 3. Canny Edge detection
+                Mat edges = new Mat();
+                Imgproc.Canny(sourceImage, edges, 25, 200, kernelSize, false);
+                Imgcodecs.imwrite(projectFilePath + filename + "_canny.jpg", edges);
+
+                // 4. Initialization of a kernel
+                Mat E = Mat.ones(kernelSize, kernelSize, 1);
+                // 5. Dilation
+                Imgproc.dilate(edges, edges, E, new Point(-1, -1), 1);
+                Imgcodecs.imwrite(projectFilePath + filename + "_dilated.jpg", edges);
+                // 6. Erosion
+                Imgproc.erode(edges, edges, E, new Point(-1, -1), 1);
+                Imgcodecs.imwrite(projectFilePath + filename + "_eroded.jpg", edges);
+                // 4. Find and draw contours
+                List<MatOfPoint> contours = new ArrayList<>();
+                Mat hierarchy = new Mat();
+                Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+                Mat drawing = Mat.zeros(sourceImage.size(), CvType.CV_8UC3);
+                Scalar color = new Scalar(0, 255, 0);
+                for (int i = 0; i < contours.size(); i++) {
+                    if(Imgproc.contourArea(contours.get(i)) > 2) {
+                        Imgproc.drawContours(drawing, contours, i, color, 2, Imgproc.LINE_8, hierarchy, 0, new Point());
+                    }
+                }
+                Imgcodecs.imwrite(projectFilePath + filename + "_contours5.jpg", drawing);
+                // 5. Find and draw rectangles
+                Mat rectangles = Mat.zeros(sourceImage.size(), CvType.CV_8UC3);
+                for(MatOfPoint c: contours) {
+                    Rect rect = Imgproc.boundingRect(c);
+                    if(rect.area() > 600) {
+                        Imgproc.rectangle(rectangles, rect, color, 2);
+                    }
+                }
+                Imgcodecs.imwrite(projectFilePath + filename + "_rectangles5.jpg", rectangles);
+
 
             }
         }
