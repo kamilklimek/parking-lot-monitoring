@@ -5,8 +5,6 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class Skeletonization {
 
@@ -21,7 +19,7 @@ public class Skeletonization {
     private static final int[][] E6 = new int[][]{{0,1,0},{1,1,-1},{0,-1,-1}};
     private static final int[][] E7 = new int[][]{{0,1,0},{-1,1,1},{-1,-1,0}};
     private static final int[][] E8 = new int[][]{{-1,-1,0},{-1,1,1},{0,1,0}};
-    private static final List<int[][]> structuringElements = new ArrayList<>();
+    private static final int[][][] structuringElements = new int[][][]{E1, E2, E3, E4, E5, E6, E7, E8};
 
 
     // == static methods ==
@@ -51,21 +49,16 @@ public class Skeletonization {
     }
 
 
-    // this is the method you should call in your main class to skeletonize
+    // this is the method you should call in your main class to extract a skeleton
     public static Mat sequentialThinning(Mat image){
         boolean continueThinning = true;
         Mat beforeThinning = image.clone();
         int i = 1;
         while(continueThinning) {
             System.out.println("Iteration number " + i);
-            image = Skeletonization.thinning(image, E1);
-            image = Skeletonization.thinning(image, E2);
-            image = Skeletonization.thinning(image, E3);
-            image = Skeletonization.thinning(image, E4);
-            image = Skeletonization.thinning(image, E5);
-            image = Skeletonization.thinning(image, E6);
-            image = Skeletonization.thinning(image, E7);
-            image = Skeletonization.thinning(image, E8);
+            for(int[][] E : structuringElements) {
+                image = Skeletonization.thinning(image, E);
+            }
             if(comparison(image, beforeThinning)){
                 continueThinning = false;
             }else{
@@ -73,7 +66,6 @@ public class Skeletonization {
                 i++;
             }
         }
-
         return image;
     }
 
