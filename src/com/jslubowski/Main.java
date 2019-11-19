@@ -18,7 +18,7 @@ public class Main {
 	    System.loadLibrary(Core.NATIVE_LIBRARY_NAME); // library load
 
         String projectFilePath = "D:\\wszystko\\studia\\semestr 7\\praca inzynierska\\ParkingLotMonitoring\\src\\data\\";
-        String filename = "example_lot2"; // name of the file to work on
+        String filename = "example_lot4"; // name of the file to work on
         int kernelSize = 3;
 
         Mat sourceImage = new Mat(); // sourceImage variable initialization
@@ -139,26 +139,38 @@ public class Main {
 //            Imgcodecs.imwrite(projectFilePath + filename + "_contours4.jpg", drawing);
 //        }
 
-            { // TODO Fourth algorithm - implement canny algorithm
+        // Fourth algorithm
+            {
                 // 1. Load an image
                 sourceImage = Imgcodecs.imread(projectFilePath + filename + ".jpg");
-                // 2. Blur
-                Imgproc.blur(sourceImage, sourceImage, new Size(3, 3));
-                Imgcodecs.imwrite(projectFilePath + filename + "_blurred.jpg", sourceImage);
+                // 2. Crop
+                Rect rectCrop = new Rect(new Point(368, 440), new Point(668, 516));
+                sourceImage = new Mat(sourceImage, rectCrop);
+                Imgcodecs.imwrite(projectFilePath + filename + "_cropped.jpg", sourceImage);
+                // 2. Noise reduction through gaussian blur
+                Imgproc.GaussianBlur(sourceImage, sourceImage,
+                     new Size(3, 3), 0, 0, Core.BORDER_DEFAULT);
+//                Imgcodecs.imwrite(projectFilePath + filename + "_blurred.jpg", sourceImage);
                 // 3. Canny Edge detection
                 Mat edges = new Mat();
-                Imgproc.Canny(sourceImage, edges, 25, 200, kernelSize, false);
-                Imgcodecs.imwrite(projectFilePath + filename + "_canny.jpg", edges);
-
+                Imgproc.Canny(sourceImage, edges, 230, 300, kernelSize, true);
+//                Imgcodecs.imwrite(projectFilePath + filename + "_canny.jpg", edges);
                 // 4. Initialization of a kernel
                 Mat E = Mat.ones(kernelSize, kernelSize, 1);
+//            System.out.println(E.dump());
+
+
                 // 5. Dilation
-                Imgproc.dilate(edges, edges, E, new Point(-1, -1), 1);
-                Imgcodecs.imwrite(projectFilePath + filename + "_dilated.jpg", edges);
-                // 6. Erosion
-                Imgproc.erode(edges, edges, E, new Point(-1, -1), 1);
-                Imgcodecs.imwrite(projectFilePath + filename + "_eroded.jpg", edges);
-                // 4. Find and draw contours
+                Imgproc.dilate(edges, edges, E, new Point(-1, -1), 4);
+//                Imgcodecs.imwrite(projectFilePath + filename + "_dilated.jpg", edges);
+//                // 6. Erosion
+//                Imgproc.erode(edges, edges, E, new Point(-1, -1), 1);
+//                Imgcodecs.imwrite(projectFilePath + filename + "_eroded.jpg", edges);
+
+
+                // 4. Initialization of a kernel
+                E = Mat.ones(kernelSize, kernelSize, 1);
+                // 5. Find and draw contours
                 List<MatOfPoint> contours = new ArrayList<>();
                 Mat hierarchy = new Mat();
                 Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -166,20 +178,24 @@ public class Main {
                 Scalar color = new Scalar(0, 255, 0);
                 for (int i = 0; i < contours.size(); i++) {
                     if(Imgproc.contourArea(contours.get(i)) > 2) {
-                        Imgproc.drawContours(drawing, contours, i, color, 2, Imgproc.LINE_8, hierarchy, 0, new Point());
+                        Imgproc.drawContours(drawing, contours, i, color, 2, Imgproc.LINE_4, hierarchy, 0, new Point());
                     }
                 }
-                Imgcodecs.imwrite(projectFilePath + filename + "_contours5.jpg", drawing);
-                // 5. Find and draw rectangles
+//                Imgcodecs.imwrite(projectFilePath + filename + "_contours.jpg", drawing);
+                // 7. Find and draw rectangles
                 Mat rectangles = Mat.zeros(sourceImage.size(), CvType.CV_8UC3);
                 for(MatOfPoint c: contours) {
                     Rect rect = Imgproc.boundingRect(c);
-                    if(rect.area() > 600) {
-                        Imgproc.rectangle(rectangles, rect, color, 2);
+                    if(rect.area() > 500) {
+                        Imgproc.rectangle(rectangles, rect, color, 1);
                     }
                 }
-                Imgcodecs.imwrite(projectFilePath + filename + "_rectangles5.jpg", rectangles);
+                Imgcodecs.imwrite(projectFilePath + filename + "_rectangles.jpg", rectangles);
 
+
+                // TODO Check the algorithm that measures the amount of taken space, and compares
+                //  it to the car, for instance, it checkes the lengths of a car, or the most optimal
+                //  cars configuration in specific spot, and compares the parking spaces to what is available
 
             }
         }
