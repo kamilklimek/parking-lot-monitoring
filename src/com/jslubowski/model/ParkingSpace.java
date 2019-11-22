@@ -5,7 +5,6 @@ import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,53 +35,66 @@ public class ParkingSpace {
     }
 
     // this is the main algorithm for detecting empty parking space
-    public void isOccupied(){
-        Mat edges = new Mat();
-        int kernelSize = 3;
-        Mat morphologyKernel = Mat.ones(3, 3, 1);
-
-        // ONLY FOR DEBUGGING - DELETE LATER
-        String projectFilePath = "D:\\wszystko\\studia\\semestr 7\\praca inzynierska\\ParkingLotMonitoring\\src\\data\\";
-        String filename = "example_lot2"; // name of the picture to work on
-        //DELETE
-
-        // Algorithm steps
-        // 1. Gaussian blur
-        Imgproc.GaussianBlur(image, imageProcessed, new Size(3, 3), 0, 0, Core.BORDER_DEFAULT);
-        saveProcessedImage(projectFilePath, filename, "blurred");
-
-        // 2. Canny Edge detection
-        Imgproc.Canny(imageProcessed, edges, 230, 300, kernelSize, false);
-        this.imageProcessed = edges;
-        saveProcessedImage(projectFilePath, filename, "canny");
-
-        // 4. Dilation
-        Imgproc.dilate(imageProcessed, imageProcessed, morphologyKernel, new Point(-1, -1), 3);
-        saveProcessedImage(projectFilePath, filename, "dilated");
-
-        // 5. Erosion
-        Imgproc.erode(imageProcessed, imageProcessed, morphologyKernel, new Point(-1, -1), 1);
-        saveProcessedImage(projectFilePath, filename, "eroded");
-
-        // 6. Find and draw rectangles around contours
-        findAndDrawRectangles();
-        saveProcessedImage(projectFilePath, filename, "rectangles");
-
-        // 7. Are conditions met?
-        // TODO implement it completely
-
-
-
+    public boolean checkOccupation(){
+        List<Rect> rectangles = preProcess();
+        // Are conditions met?
+        // TODO implement it properly
+        System.out.print("Space " + name + " is ");
+        if(rectangles.size() >= 1) {
+            System.out.println("occupied.");
+            return true;
+        }
+        else {
+            System.out.println("not occupied.");
+            return false;
+        }
     }
 
         // this is a method to call if you want to draw your rectangles
+        private List<Rect> preProcess(){
+            Mat edges = new Mat();
+            int kernelSize = 3;
+            Mat morphologyKernel = Mat.ones(3, 3, 1);
+
+            // ONLY FOR DEBUGGING - DELETE LATER
+            String projectFilePath = System.getProperty("user.dir") + "\\src\\data\\";
+            String filename = "example_lot6"; // name of the picture to work on
+            //DELETE LATER
+
+            // Algorithm steps
+            // 1. Gaussian blur
+            Imgproc.GaussianBlur(image, imageProcessed, new Size(3, 3), 0, 0, Core.BORDER_DEFAULT);
+//            saveProcessedImage(projectFilePath, filename, "blurred");
+
+
+            // 2. Canny Edge detection
+
+            Imgproc.Canny(imageProcessed, edges, 230, 300, kernelSize, false);
+            this.imageProcessed = edges;
+//                saveProcessedImage(projectFilePath, filename, "canny");
+
+            // 4. Dilation
+            Imgproc.dilate(imageProcessed, imageProcessed, morphologyKernel, new Point(-1, -1), 3);
+
+            // 5. Erosion
+            Imgproc.erode(imageProcessed, imageProcessed, morphologyKernel, new Point(-1, -1), 1);
+//            saveProcessedImage(projectFilePath, filename, "eroded");
+
+            // 6. Find and draw rectangles around contours
+            List<Rect> rectangles = findAndDrawRectangles();
+//            saveProcessedImage(projectFilePath, filename, "rectangles");
+
+            return rectangles;
+
+        }
+
         private List<Rect> findAndDrawRectangles(){
             List<MatOfPoint> contours = findAndDrawContours();
             List<Rect> retContours = new ArrayList<>();
             Mat rectangles = Mat.zeros(imageProcessed.size(), CvType.CV_8UC3);
             for(MatOfPoint c: contours) {
                     Rect rect = Imgproc.boundingRect(c);
-                    if(rect.area() > 500) {
+                    if(rect.area() > 600) {
                         Imgproc.rectangle(rectangles, rect, new Scalar(0, 255, 0), 1);
                         retContours.add(rect);
                     }
