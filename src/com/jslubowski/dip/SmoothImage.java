@@ -9,7 +9,6 @@ public class SmoothImage {
     // == fields ==
     private static final int kernelSize = 3;
 
-
     // == methods ==
     public static Mat smoothGrayscaleImage(Mat source){
         Mat kernel = Mat.ones(kernelSize, kernelSize, CvType.CV_32F);

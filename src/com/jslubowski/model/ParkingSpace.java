@@ -16,6 +16,7 @@ public class ParkingSpace {
     private Point cornerBottomRight;
     private Mat image;
     private Mat imageProcessed;
+    private int area;
 
     // == constructor ==
 
@@ -23,6 +24,7 @@ public class ParkingSpace {
         this.cornerTopLeft = new Point(x1, y1);
         this.cornerBottomRight = new Point(x2, y2);
         this.name = name;
+        this.area = (x2 - x1) * (y2 - y1);
         // crop out the parking spot from the image
         Rect rectCrop = new Rect(cornerTopLeft, cornerBottomRight);
         this.image = new Mat(image, rectCrop);
@@ -38,14 +40,13 @@ public class ParkingSpace {
     public boolean checkOccupation(){
         List<Rect> rectangles = preProcess();
         // Are conditions met?
-        // TODO implement it properly
-        System.out.print("Space " + name + " is ");
+//        System.out.print("Space " + name + " is ");
         if(rectangles.size() >= 1) {
-            System.out.println("occupied.");
+//            System.out.println("occupied.");
             return true;
         }
         else {
-            System.out.println("not occupied.");
+//            System.out.println("not occupied.");
             return false;
         }
     }
@@ -58,23 +59,23 @@ public class ParkingSpace {
 
             // ONLY FOR DEBUGGING - DELETE LATER
             String projectFilePath = System.getProperty("user.dir") + "\\src\\data\\";
-            String filename = "example_lot6"; // name of the picture to work on
+            String filename = "example_lot3"; // name of the picture to work on
             //DELETE LATER
 
             // Algorithm steps
             // 1. Gaussian blur
-            Imgproc.GaussianBlur(image, imageProcessed, new Size(3, 3), 0, 0, Core.BORDER_DEFAULT);
+            if(this.name.equals("P1") || this.name.equals("P2") || this.name.equals("P3") || this.name.equals("P4")|| this.name.equals("P13")|| this.name.equals("P12")) {
+                Imgproc.GaussianBlur(image, imageProcessed, new Size(3, 3), 0, 0, Core.BORDER_DEFAULT);
+            }
 //            saveProcessedImage(projectFilePath, filename, "blurred");
 
-
             // 2. Canny Edge detection
-
             Imgproc.Canny(imageProcessed, edges, 230, 300, kernelSize, false);
             this.imageProcessed = edges;
 //                saveProcessedImage(projectFilePath, filename, "canny");
 
             // 4. Dilation
-            Imgproc.dilate(imageProcessed, imageProcessed, morphologyKernel, new Point(-1, -1), 3);
+            Imgproc.dilate(imageProcessed, imageProcessed, morphologyKernel, new Point(-1, -1), 4);
 
             // 5. Erosion
             Imgproc.erode(imageProcessed, imageProcessed, morphologyKernel, new Point(-1, -1), 1);
@@ -85,7 +86,6 @@ public class ParkingSpace {
 //            saveProcessedImage(projectFilePath, filename, "rectangles");
 
             return rectangles;
-
         }
 
         private List<Rect> findAndDrawRectangles(){
@@ -94,36 +94,21 @@ public class ParkingSpace {
             Mat rectangles = Mat.zeros(imageProcessed.size(), CvType.CV_8UC3);
             for(MatOfPoint c: contours) {
                     Rect rect = Imgproc.boundingRect(c);
-                    if(rect.area() > 600) {
-                        Imgproc.rectangle(rectangles, rect, new Scalar(0, 255, 0), 1);
-                        retContours.add(rect);
+                    if((rect.area() > (this.area / 6)) || (this.name == "P1" && rect.area() > this.area / 3) ) {
+                            Imgproc.rectangle(rectangles, rect, new Scalar(0, 255, 0), 1);
+                            retContours.add(rect);
                     }
                 }
             this.imageProcessed = rectangles;
             return retContours;
         }
 
-
         private List<MatOfPoint> findAndDrawContours(){
             List<MatOfPoint> contours = new ArrayList<>();
             Mat hierarchy = new Mat();
             Imgproc.findContours(imageProcessed, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-            Mat drawing = Mat.zeros(imageProcessed.size(), CvType.CV_8UC3);
-            Scalar color = new Scalar(0, 255, 0);
-            for (int i = 0; i < contours.size(); i++) {
-                if(Imgproc.contourArea(contours.get(i)) > 2) {
-                    Imgproc.drawContours(drawing, contours, i, color, 2, Imgproc.LINE_4, hierarchy, 0, new Point());
-                }
-            }
-            this.imageProcessed = drawing;
             return contours;
         }
-
-
-
-
-
-
 
 
     // == getters and setters ==
