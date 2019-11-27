@@ -1,5 +1,5 @@
 # parking-lot-monitoring
-This application is in v0.3 version and it is work in progress.
+This application is in v0.4 version and it is work in progress.
 
 # What is it about?
 The application uses OpenCV. It is a library for Computer Vision. 
