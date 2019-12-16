@@ -1,4 +1,4 @@
-package com.jslubowski.util;
+package com.jslubowski.dip;
 
 import com.jslubowski.model.ParkingSpace;
 import org.opencv.core.*;

@@ -1,7 +1,7 @@
 package com.jslubowski;
 
 import com.jslubowski.model.ParkingSpace;
-import com.jslubowski.util.Drawing;
+import com.jslubowski.dip.Drawing;
 import com.jslubowski.util.FileFolderService;
 import com.jslubowski.util.ParkingSpacesCreation;
 import org.opencv.core.*;
