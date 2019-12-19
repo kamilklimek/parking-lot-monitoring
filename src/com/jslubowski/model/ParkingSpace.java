@@ -17,6 +17,7 @@ public class ParkingSpace {
     private Mat image;
     private Mat imageProcessed;
     private int area;
+    private boolean occupied;
 
     // == constructor ==
     public ParkingSpace(int x1, int y1, int x2, int y2, Mat image, String name) {
@@ -34,10 +35,7 @@ public class ParkingSpace {
     /*
      * this is the main algorithm for detecting empty parking space
      */
-    public boolean checkOccupation(){
-        this.imageProcessed = Processing.preProcess(this.name, this.image, this.imageProcessed);
-        List<Rect> rectangles = Drawing.findAndDrawRectangles(this.imageProcessed, this.name, this.area);
-
+    public boolean checkOccupation(List<Rect> rectangles){
         // Are conditions met?
         if(rectangles.size() >= 1) return true;
         else return false;
@@ -82,5 +80,21 @@ public class ParkingSpace {
 
     public void setImageProcessed(Mat imageProcessed) {
         this.imageProcessed = imageProcessed;
+    }
+
+    public int getArea() {
+        return area;
+    }
+
+    public void setArea(int area) {
+        this.area = area;
+    }
+
+    public boolean isOccupied() {
+        return occupied;
+    }
+
+    public void setOccupied(boolean occupied) {
+        this.occupied = occupied;
     }
 }

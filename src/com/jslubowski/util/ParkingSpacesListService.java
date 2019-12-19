@@ -5,11 +5,10 @@ import org.opencv.core.Mat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParkingSpacesCreation {
+public class ParkingSpacesListService {
+
     public static List<ParkingSpace> createParkingSpaces(List<Integer> spacesCoordinates, Mat sourceImage){
-        /*
-         TODO Here extract pre and post processed images and save then in order to subtract them
-         */
+
         List<ParkingSpace> parkingSpaces = new ArrayList<>();
         int counter = 0;
         int[] coordinates = new int[4];
@@ -27,4 +26,5 @@ public class ParkingSpacesCreation {
         }
         return parkingSpaces;
     }
+
 }
