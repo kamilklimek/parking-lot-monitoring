@@ -10,16 +10,18 @@ import java.util.List;
 
 public class Processing {
 
-    private final static int THRESHOLD1 = 230;
-    private final static int THRESHOLD2 = 300;
-    private final static int KERNEL_SIZE = 3;
-    private final static int DILATION_ITERATIONS = 4;
-    private final static int EROSION_ITERATIONS = 1;
-    private final static Point MORPHOLOGY_POINT = new Point(-1, -1);
+    private final static int THRESHOLD1                         = 200;
+    private final static int THRESHOLD2                         = 300;
+    private final static int KERNEL_SIZE                        = 3;
+    private final static int DILATION_ITERATIONS                = 4;
+    private final static int EROSION_ITERATIONS                 = 1;
+    private final static Point MORPHOLOGY_POINT                 = new Point(-1, -1);
+    private final static int WHITE_PIXEL_DIFFERENCE_THRESHOLD   = 450;
 
     /*
-     * this is a method to call if you want to draw your rectangles
+     * this is a method to call to prepare an image for further analysis
      */
+
     public static Mat preProcess(String name, Mat image) {
         Mat edges = new Mat();
         Mat imageProcessed = new Mat(image.rows(), image.cols(), image.type());
@@ -62,16 +64,22 @@ public class Processing {
         return Math.abs(currentWhitePixels - previousWhitePixels);
     }
 
-    public static void runAnalysis(List<ParkingSpace> previousParkingSpaces, List<ParkingSpace> parkingSpaces, List<ParkingSpace> currentParkingSpaces, Mat outputImage,
+    public static void runAnalysis(List<ParkingSpace> previousParkingSpaces,
+                                   List<ParkingSpace> currentParkingSpaces, Mat outputImage,
                                    String projectFilePath, String filename, String s){
 
         if(!previousParkingSpaces.isEmpty()){
-            for(int i = 0; i < parkingSpaces.size(); i++) {
-                // 1. Calculate the difference of white pixels between two images
-                int difference = Processing.getWhitePixelsDifference(currentParkingSpaces.get(i).getImageProcessed(), previousParkingSpaces.get(i).getImageProcessed());
+            for(int i = 0; i < currentParkingSpaces.size(); i++) {
 
-                // 2. If number of pixels isn't bigger then THRESHOLD then check the contours
-                if(difference > 450){
+                // 1. Calculate the difference of white pixels between two images
+                int difference = Processing.getWhitePixelsDifference(currentParkingSpaces.get(i).getImageProcessed(),
+                        previousParkingSpaces.get(i).getImageProcessed());
+
+                /*
+                 2. If number of pixels isn't bigger then THRESHOLD then check the contours
+                    Otherwise set occupation as the same value as a previous photo
+                 */
+                if(difference > WHITE_PIXEL_DIFFERENCE_THRESHOLD){
                     List<Rect> rectangles = Drawing.getRectangles(currentParkingSpaces.get(i));
                     currentParkingSpaces.get(i).setOccupied(currentParkingSpaces.get(i).checkOccupation(rectangles));
                     outputImage = Drawing.drawParkingSpace(currentParkingSpaces.get(i), outputImage, currentParkingSpaces.get(i).isOccupied());
@@ -84,7 +92,7 @@ public class Processing {
         }
         // 3. If it is the first image
         else {
-            for (ParkingSpace p : parkingSpaces) {
+            for (ParkingSpace p : currentParkingSpaces) {
                 List<Rect> rectangles = Drawing.getRectangles(p);
                 p.setOccupied(p.checkOccupation(rectangles));
                 outputImage = Drawing.drawParkingSpace(p, outputImage, p.isOccupied());

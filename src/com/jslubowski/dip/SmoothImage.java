@@ -5,7 +5,10 @@ import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 public class SmoothImage {
-
+    /*
+    Class not used but attached for future use.
+     */
+    
     // == fields ==
     private static final int kernelSize = 3;
 
